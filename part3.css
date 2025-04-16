@@ -1,0 +1,21 @@
+::selection{
+    color: black;
+    background-color: #fbca45;
+}
+
+body{
+    background-color: #ffdd80;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+div{
+    display: flex;
+    /* text-align: center; */
+    align-items: center;
+    justify-content: center;
+    height: 95vh;
+    /* width: 100vw; */
+    font-weight: bold;
+    font-size: xx-large;
+    border: 10px double black;
+}
