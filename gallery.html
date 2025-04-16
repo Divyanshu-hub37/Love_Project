@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Gallery</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .bento-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+        .bento-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: transform 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bento-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .bento-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        /* Fullscreen Viewer */
+        .fullscreen-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .fullscreen-view img {
+            max-width: 90%;
+            max-height: 90%;
+            opacity: 0;
+        }
+        .fullscreen-view .close, .fullscreen-view .prev, .fullscreen-view .next {
+            position: absolute;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            user-select: none;
+        }
+        .fullscreen-view .close {
+            top: 20px;
+            right: 20px;
+        }
+        .fullscreen-view .prev {
+            left: 20px;
+        }
+        .fullscreen-view .next {
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5 text-center">
+        <h1 class="text-danger mb-4">❤️ Our Love Story ❤️</h1>
+        <div class="bento-container" id="gallery"></div>
+    </div>
+
+    <div class="fullscreen-view" id="fullscreen-view">
+        <span class="close" onclick="closeFullscreen()">&times;</span>
+        <span class="prev" onclick="prevImage()">&#10094;</span>
+        <img id="fullscreen-img" src="" alt="Fullscreen View">
+        <span class="next" onclick="nextImage()">&#10095;</span>
+    </div>
+
+    <span style="color: black; font-weight: bold;">To be continued..........</span>
+
+    <div>
+        <div class="footer" style="margin-top: 100px; background-color: pink; width: 1520px; height: 50px; color: black; padding-top: 10px;">
+            ❤️ Rohit & Sneha ❤️
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const gallery = document.getElementById("gallery");
+            const images = [];
+            
+            for(let i = 1; i <= 35; i++) {
+                let item = document.createElement("div");
+                item.classList.add("bento-item");
+                let img = document.createElement("img");
+                img.src = `public/images/img${i}.png`;
+                img.alt = "Romantic Moment";
+                img.dataset.index = i - 1;
+                images.push(img.src);
+                img.onclick = function() { openFullscreen(img.dataset.index); };
+                
+                img.onload = function() {
+                    if (img.naturalWidth > img.naturalHeight) {
+                        item.style.gridColumn = "span 2";
+                    } else {
+                        item.style.gridRow = "span 2";
+                    }
+                };
+                item.appendChild(img);
+                gallery.appendChild(item);
+            }
+
+            gsap.utils.toArray(".bento-item").forEach((item, index) => {
+                gsap.to(item, {
+                    scrollTrigger: {
+                        trigger: item,
+                        start: "top 80%",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    delay: index * 0.05
+                });
+            });
+
+            let currentIndex = 0;
+            const fullscreenView = document.getElementById("fullscreen-view");
+            const fullscreenImg = document.getElementById("fullscreen-img");
+            
+            function showImageWithAnimation(index, direction) {
+                gsap.fromTo(fullscreenImg, 
+                    { x: direction === 'next' ? "100%" : "-100%", opacity: 0 }, 
+                    { x: "0%", opacity: 1, duration: 0.5 }
+                );
+                fullscreenImg.src = images[index];
+            }
+            
+            window.openFullscreen = function(index) {
+                currentIndex = parseInt(index);
+                fullscreenView.style.display = "flex";
+                showImageWithAnimation(currentIndex, 'next');
+            };
+            
+            window.closeFullscreen = function() {
+                fullscreenView.style.display = "none";
+            };
+            
+            window.prevImage = function() {
+                currentIndex = (currentIndex - 1 + images.length) % images.length;
+                showImageWithAnimation(currentIndex, 'prev');
+            };
+            
+            window.nextImage = function() {
+                currentIndex = (currentIndex + 1) % images.length;
+                showImageWithAnimation(currentIndex, 'next');
+            };
+        });
+    </script>
+</body>
+</html>
